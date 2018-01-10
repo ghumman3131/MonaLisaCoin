@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=MonaLisaCoin
+Comment=MonaLisaCoin P2P Cryptocurrency
+Comment[fr]=MonaLisaCoin, monnaie virtuelle cryptographique pair à pair
+Comment[tr]=MonaLisaCoin, eşten eşe kriptografik sanal para birimi
+Exec=monalisacoin-qt %u
+Terminal=false
+Type=Application
+Icon=monalisacoin128
+MimeType=x-scheme-handler/monalisacoin;
+Categories=Office;Finance;

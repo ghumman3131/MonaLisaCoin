@@ -1,0 +1,22 @@
+[Unit]
+Description=MonaLisaCoin's distributed currency daemon
+After=network.target
+
+[Service]
+User=monalisacoin
+Group=monalisacoin
+
+Type=forking
+PIDFile=/var/lib/monalisacoind/monalisacoind.pid
+ExecStart=/usr/bin/monalisacoind -daemon -pid=/var/lib/monalisacoind/monalisacoind.pid \
+-conf=/etc/monalisacoin/monalisacoin.conf -datadir=/var/lib/monalisacoind -disablewallet
+
+Restart=always
+PrivateTmp=true
+TimeoutStopSec=60s
+TimeoutStartSec=2s
+StartLimitInterval=120s
+StartLimitBurst=5
+
+[Install]
+WantedBy=multi-user.target

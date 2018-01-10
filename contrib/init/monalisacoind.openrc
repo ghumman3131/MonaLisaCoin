@@ -1,0 +1,88 @@
+#!/sbin/runscript
+
+# backward compatibility for existing gentoo layout 
+#
+if [ -d "/var/lib/monalisacoin/.monalisacoin" ]; then
+	MONALISACOIND_DEFAULT_DATADIR="/var/lib/monalisacoin/.monalisacoin"
+else
+	MONALISACOIND_DEFAULT_DATADIR="/var/lib/monalisacoind"
+fi
+
+MONALISACOIND_CONFIGFILE=${MONALISACOIND_CONFIGFILE:-/etc/monalisacoin/monalisacoin.conf}
+MONALISACOIND_PIDDIR=${MONALISACOIND_PIDDIR:-/var/run/monalisacoind}
+MONALISACOIND_PIDFILE=${MONALISACOIND_PIDFILE:-${MONALISACOIND_PIDDIR}/monalisacoind.pid}
+MONALISACOIND_DATADIR=${MONALISACOIND_DATADIR:-${MONALISACOIND_DEFAULT_DATADIR}}
+MONALISACOIND_USER=${MONALISACOIND_USER:-${MONALISACOIN_USER:-monalisacoin}}
+MONALISACOIND_GROUP=${MONALISACOIND_GROUP:-monalisacoin}
+MONALISACOIND_BIN=${MONALISACOIND_BIN:-/usr/bin/monalisacoind}
+MONALISACOIND_NICE=${MONALISACOIND_NICE:-${NICELEVEL:-0}}
+MONALISACOIND_OPTS="${MONALISACOIND_OPTS:-${MONALISACOIN_OPTS}}"
+
+name="MonaLisaCoin Core Daemon"
+description="MonaLisaCoin cryptocurrency P2P network daemon"
+
+command="/usr/bin/monalisacoind"
+command_args="-pid=\"${MONALISACOIND_PIDFILE}\" \
+		-conf=\"${MONALISACOIND_CONFIGFILE}\" \
+		-datadir=\"${MONALISACOIND_DATADIR}\" \
+		-daemon \
+		${MONALISACOIND_OPTS}"
+
+required_files="${MONALISACOIND_CONFIGFILE}"
+start_stop_daemon_args="-u ${MONALISACOIND_USER} \
+			-N ${MONALISACOIND_NICE} -w 2000"
+pidfile="${MONALISACOIND_PIDFILE}"
+retry=60
+
+depend() {
+	need localmount net
+}
+
+# verify
+# 1) that the datadir exists and is writable (or create it)
+# 2) that a directory for the pid exists and is writable
+# 3) ownership and permissions on the config file
+start_pre() {
+	checkpath \
+	-d \
+	--mode 0750 \
+	--owner "${MONALISACOIND_USER}:${MONALISACOIND_GROUP}" \
+	"${MONALISACOIND_DATADIR}"
+
+	checkpath \
+	-d \
+	--mode 0755 \
+	--owner "${MONALISACOIND_USER}:${MONALISACOIND_GROUP}" \
+	"${MONALISACOIND_PIDDIR}"
+
+	checkpath -f \
+	-o ${MONALISACOIND_USER}:${MONALISACOIND_GROUP} \
+	-m 0660 \
+	${MONALISACOIND_CONFIGFILE}
+
+	checkconfig || return 1
+}
+
+checkconfig()
+{
+	if ! grep -qs '^rpcpassword=' "${MONALISACOIND_CONFIGFILE}" ; then
+		eerror ""
+		eerror "ERROR: You must set a secure rpcpassword to run monalisacoind."
+		eerror "The setting must appear in ${MONALISACOIND_CONFIGFILE}"
+		eerror ""
+		eerror "This password is security critical to securing wallets "
+		eerror "and must not be the same as the rpcuser setting."
+		eerror "You can generate a suitable random password using the following"
+		eerror "command from the shell:"
+		eerror ""
+		eerror "bash -c 'tr -dc a-zA-Z0-9 < /dev/urandom | head -c32 && echo'"
+		eerror ""
+		eerror "It is also recommended that you also set alertnotify so you are "
+		eerror "notified of problems:"
+		eerror ""
+		eerror "ie: alertnotify=echo %%s | mail -s \"MonaLisaCoin Alert\"" \
+			"admin@foo.com"
+		eerror ""
+		return 1
+	fi
+}

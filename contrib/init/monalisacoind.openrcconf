@@ -1,0 +1,27 @@
+# /etc/conf.d/monalisacoind: config file for /etc/init.d/monalisacoind
+
+# Config file location
+#MONALISACOIND_CONFIGFILE="/etc/monalisacoin/monalisacoin.conf"
+
+# What directory to write pidfile to?  (created and owned by $MONALISACOIND_USER)
+#MONALISACOIND_PIDDIR="/var/run/monalisacoind"
+
+# What filename to give the pidfile
+#MONALISACOIND_PIDFILE="${MONALISACOIND_PIDDIR}/monalisacoind.pid"
+
+# Where to write monalisacoind data (be mindful that the blockchain is large)
+#MONALISACOIND_DATADIR="/var/lib/monalisacoind"
+
+# User and group to own monalisacoind process
+#MONALISACOIND_USER="monalisacoin"
+#MONALISACOIND_GROUP="monalisacoin"
+
+# Path to monalisacoind executable
+#MONALISACOIND_BIN="/usr/bin/monalisacoind"
+
+# Nice value to run monalisacoind under
+#MONALISACOIND_NICE=0
+
+# Additional options (avoid -conf and -datadir, use flags above)
+MONALISACOIND_OPTS="-disablewallet"
+

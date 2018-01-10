@@ -1,0 +1,11 @@
+[Protocol]
+exec=monalisacoin-qt '%u'
+protocol=monalisacoin
+input=none
+output=none
+helper=true
+listing=
+reading=false
+writing=false
+makedir=false
+deleting=false
